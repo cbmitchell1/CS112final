@@ -2,7 +2,7 @@
 cleanData <- function(NS) {
   #more friendly column names
   NS <- setNames(NS, c("Course", "Grader", "Section", "Class", "Assignment", "Hashtag", "College"
-                       , "1", "2", "3", "4", "6"))
+                       , "1", "2", "3", "4", "5"))
   #replacing NAs with 0s in each HC score column
   NS[,8:12][is.na(NS[,8:12])] <- 0
   #excluding all assignment grades
@@ -28,20 +28,24 @@ HCsum <- function(AssessData) {
 #finding count of all grades in a section
 HCsumall <- function(AssessData) {
   AssessData <- aggregate(x = AssessData[8:12], by = list(Section = AssessData$Section), FUN = sum)
+  #sum new aggregated columns 8:12 for each row 
+  gradeCount <- for(i in 1:nrow(AssessData))
+  AssessData <- cbind(AssessData, gradeCount)
   return(AssessData)
 }
 
 #finding total points awarded for an HC in a section
 pointsum <- function(AssessData){
+  totalPoints <- matrix(data = NA, nrow = length(AssessData), ncol = 1)
   for (i in 1:nrow(AssessData)) {
-    points <- AssessData[i,8]+2*AssessData[i,9]+3*AssessData[i,10]+
+    rowPoint <- AssessData[i,8]+2*AssessData[i,9]+3*AssessData[i,10]+
       4*AssessData[i,11]+5*AssessData[i,12]
+    totalPoints[i,1] <- rowPoint
   }
-  AssessData <- cbind(AssessData, points)
+  print(totalPoints)
+  AssessData <- cbind(AssessData, totalPoints)
   return(AssessData)
 }
-
-#finding total points for awarded for an HC in all sections
 
 #saving dataframes
 n <- rbind(HCsum(NS), HCsum(SS), HCsum(CS), HCsum(B), HCsum(AH))
@@ -50,7 +54,6 @@ p <- pointsum(n)
 P <- pointsum(N)
 
 #bringingittogether
-
-write.csv(NS_N)
+AverageSectionScore <- P[,]
 
 
