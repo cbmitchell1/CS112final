@@ -29,20 +29,31 @@ HCsum <- function(AssessData) {
 HCsumall <- function(AssessData) {
   AssessData <- aggregate(x = AssessData[8:12], by = list(Section = AssessData$Section), FUN = sum)
   #sum new aggregated columns 8:12 for each row 
-  gradeCount <- for(i in 1:nrow(AssessData))
+  gradeCount <- rowSums(AssessData[,2:6])
   AssessData <- cbind(AssessData, gradeCount)
   return(AssessData)
 }
 
 #finding total points awarded for an HC in a section
 pointsum <- function(AssessData){
-  totalPoints <- matrix(data = NA, nrow = length(AssessData), ncol = 1)
+  totalPoints <- matrix(data = NA, nrow = nrow(AssessData), ncol = 1)
   for (i in 1:nrow(AssessData)) {
-    rowPoint <- AssessData[i,8]+2*AssessData[i,9]+3*AssessData[i,10]+
-      4*AssessData[i,11]+5*AssessData[i,12]
+    rowPoint <- AssessData[i,3]+(2*AssessData[i,4])+(3*AssessData[i,5])+
+      (4*AssessData[i,6])+(5*AssessData[i,7])
     totalPoints[i,1] <- rowPoint
   }
-  print(totalPoints)
+  AssessData <- cbind(AssessData, totalPoints)
+  return(AssessData)
+}
+
+#finding total points awarded for all grades in a section
+pointsumall <- function(AssessData){
+  totalPoints <- matrix(data = NA, nrow = nrow(AssessData), ncol = 1)
+  for (i in 1:nrow(AssessData)) {
+    rowPoint <- AssessData[i,2]+(2*AssessData[i,3])+(3*AssessData[i,4])+
+      (4*AssessData[i,5])+(5*AssessData[i,6])
+    totalPoints[i,1] <- rowPoint
+  }
   AssessData <- cbind(AssessData, totalPoints)
   return(AssessData)
 }
@@ -51,9 +62,13 @@ pointsum <- function(AssessData){
 n <- rbind(HCsum(NS), HCsum(SS), HCsum(CS), HCsum(B), HCsum(AH))
 N <- rbind(HCsumall(NS), HCsumall(SS), HCsumall(CS), HCsumall(B), HCsumall(AH))
 p <- pointsum(n)
-P <- pointsum(N)
+P <- pointsumall(N)
 
 #bringingittogether
-AverageSectionScore <- P[,]
+AverageSectionScore <- matrix(data = NA, nrow = nrow(P), ncol = 1)
+for (i in 1:nrow(P)){
+  AverageSectionScore[i,1] <- P[i,8]/P[i,7]
+}
+print(AverageSectionScore)
 
 
