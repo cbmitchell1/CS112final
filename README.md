@@ -1,2 +1,2 @@
 # CS112final
-Evan and Connor's Final project
+Information-Based Decision Making Final Project
